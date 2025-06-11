@@ -7,6 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -16,14 +19,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-        User existingUser = userService.findByUsername(user.getUsername());
+        User existingUser = userService.findByEmail(user.getEmail());
 
         if (existingUser == null) {
-            return ResponseEntity.status(401).body("User not found");
+            return ResponseEntity.status(401).body(Map.of("message", "User not found"));
         }
 
         if (!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
-            return ResponseEntity.status(401).body("Invalid password");
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid password"));
         }
         return ResponseEntity.ok(existingUser);
     }
@@ -32,6 +35,9 @@ public class UserController {
     public ResponseEntity<?> register(@RequestBody User user) {
         if (userService.existsByUsername(user.getUsername())) {
             return ResponseEntity.badRequest().body("Username already exists");
+        }
+        if (userService.existsByEmail(user.getEmail())) {
+            return ResponseEntity.badRequest().body("Email already exists");
         }
         User newUser = userService.register(user);
         return ResponseEntity.ok(newUser);

@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-
 public class User {
     public String getRole;
     @Id
     @GeneratedValue
     private Long id;
     private String username;
+    private String email;
     private String password;
     private String role;
 }
